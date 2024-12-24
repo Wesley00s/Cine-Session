@@ -1,9 +1,21 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.hilt.android)
     kotlin("kapt") version "2.0.20"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.20"
+}
+
+fun getEnvProperty(key: String): String {
+    val properties = Properties()
+    val file = rootProject.file(".env")
+    if (file.exists()) {
+        properties.load(file.inputStream())
+    }
+    return properties.getProperty(key) ?: throw IllegalArgumentException("Key not found: $key")
 }
 
 android {
@@ -21,6 +33,11 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("String", "API_KEY", "\"${getEnvProperty("API_KEY")}\"")
+        buildConfigField("String", "BASE_URL", "\"${getEnvProperty("BASE_URL")}\"")
+        buildConfigField("String", "ACCOUNT_ID", "\"${getEnvProperty("ACCOUNT_ID")}\"")
+
     }
 
     buildTypes {
@@ -30,6 +47,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+
+        buildFeatures {
+            buildConfig = true
         }
     }
     compileOptions {
@@ -68,6 +89,8 @@ dependencies {
     implementation(libs.dagger.hilt)
     kapt(libs.dagger.hilt.compiler)
 
+    implementation(libs.dotenv.kotlin)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -84,4 +107,3 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
-
