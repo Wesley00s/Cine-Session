@@ -1,5 +1,9 @@
 package com.example.cine.session.core.network
 
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.HttpTimeout
@@ -8,12 +12,16 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import javax.inject.Singleton
 
+@Module
+@InstallIn(SingletonComponent::class)
 object KtorHttpClient {
     private const val NETWORK_TIMEOUT = 5_000L
-
-    val httpClientAndroid by lazy {
-        HttpClient(Android) {
+    @Provides
+    @Singleton
+    fun provideHttpClient(): HttpClient {
+        return HttpClient(Android) {
             install(ContentNegotiation) {
                 json(
                     Json {
