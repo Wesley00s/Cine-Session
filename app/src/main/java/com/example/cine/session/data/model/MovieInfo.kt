@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MovieInfo(
     @SerialName("backdrop_path") val backdropPath: String? = null,
+    @SerialName("genres_ids") val genresIds: List<Int>? = emptyList(),
     val genres: List<Genre>? = emptyList(),
     val homepage: String? = null,
     val id: Int? = null,
