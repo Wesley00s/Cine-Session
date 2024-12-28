@@ -1,6 +1,6 @@
 package com.example.cine.session.data.model
 
-import com.example.cine.session.data.remote.response.series.GenreResponse
+import com.example.cine.session.data.remote.response.movie.Genre
 import com.example.cine.session.data.remote.response.series.ProductionCountryResponse
 import com.example.cine.session.data.remote.response.series.SeasonResponse
 import kotlinx.serialization.SerialName
@@ -10,7 +10,9 @@ import kotlinx.serialization.Serializable
 data class SerieInfo(
     @SerialName("backdrop_path") val backdropPath: String? = null,
     @SerialName("episode_run_time") val episodeRunTime: List<Int>? = null,
-    val genres: List<GenreResponse>? = null,
+    @SerialName("genres_ids") val genresIds: List<Int>? = emptyList(),
+    @SerialName("first_air_date") val firstAirDate: String? = null,
+    val genres: List<Genre>? = emptyList(),
     val homepage: String? = null,
     val id: Int? = null,
     val name: String? = null,
