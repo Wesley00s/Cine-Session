@@ -1,7 +1,6 @@
 package com.example.cine.session.data.remote.datasource
 
 import com.example.cine.session.BuildConfig
-import com.example.cine.session.core.network.KtorHttpClient
 import com.example.cine.session.data.model.EpisodeInfo
 import com.example.cine.session.data.model.FavoriteRequest
 import com.example.cine.session.data.model.FavoriteResponse
@@ -156,4 +155,17 @@ class KtorSerieRemoteDatasource @Inject constructor(
     } catch (e: Exception) {
         Result.failure(e)
     }
+
+    override suspend fun getSimilarSeries(serieId: Int, page: Int): Result<ListSeriesResponse> =
+        try {
+            val response = httpClient
+                .get("$BASE_URL/tv/$serieId/similar?language=en-US&page=$page") {
+                    header("Authorization", "Bearer $TOKEN_API")
+                    header("accept", "application/json")
+                }
+                .body<ListSeriesResponse>()
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
 }
