@@ -1,6 +1,9 @@
 package com.example.cine.session.ui.component
 
+import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -14,25 +17,25 @@ import coil3.compose.AsyncImage
 import com.example.cine.session.data.model.MovieInfo
 
 @Composable
-fun MovieCard(
+fun <T> ItemCard(
     modifier: Modifier = Modifier,
-    movieInfo: MovieInfo,
-    onClick: (MovieInfo) -> Unit
+    item: T,
+    onClick: (T) -> Unit,
+    content: @Composable BoxScope.(T) -> Unit
 ) {
-
     Card(
         modifier = modifier
             .width(150.dp)
             .height(225.dp)
-            .clickable { onClick(movieInfo) },
+            .clickable { onClick(item) },
         elevation = CardDefaults
             .cardElevation(defaultElevation = 10.dp),
         shape = RoundedCornerShape(10.dp),
     ) {
-        AsyncImage(
-            model = "https://image.tmdb.org/t/p/original${movieInfo.posterPath}",
-            contentDescription = "Poster",
+        Box(
             modifier = Modifier.fillMaxSize()
-        )
+        ) {
+            content(item)
+        }
     }
 }
