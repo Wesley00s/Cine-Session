@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -14,13 +13,26 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.cine.session.data.model.MovieInfo
 import com.example.cine.session.ui.route.Home
+import com.example.cine.session.ui.route.Initial
+import com.example.cine.session.ui.route.Login
 import com.example.cine.session.ui.route.Movie
+import com.example.cine.session.ui.route.Serie
+import com.example.cine.session.ui.route.SignUp
+import com.example.cine.session.ui.route.Splash
 import com.example.cine.session.ui.screen.home.HomeScreen
 import com.example.cine.session.ui.screen.home.HomeViewModel
+import com.example.cine.session.ui.screen.initial.InitialScreen
+import com.example.cine.session.ui.screen.initial.InitialViewModel
+import com.example.cine.session.ui.screen.login.LoginScreen
+import com.example.cine.session.ui.screen.login.LoginViewModel
 import com.example.cine.session.ui.screen.movie.MovieScreen
 import com.example.cine.session.ui.screen.movie.MovieViewModel
+import com.example.cine.session.ui.screen.serie.SerieScreen
+import com.example.cine.session.ui.screen.serie.SerieViewModel
+import com.example.cine.session.ui.screen.signup.SignUpScreen
+import com.example.cine.session.ui.screen.signup.SignUpViewModel
+import com.example.cine.session.ui.screen.splash.SplashScreen
 import com.example.cine.session.ui.theme.CineSessionTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -33,27 +45,85 @@ class MainActivity : ComponentActivity() {
         setContent {
             CineSessionTheme {
                 val navController = rememberNavController()
+                val initialScreenViewModel by viewModels<InitialViewModel>()
+                val initialUiState by initialScreenViewModel.uiState.collectAsStateWithLifecycle()
+                val loginScreenViewModel by viewModels<LoginViewModel>()
+                val loginUiState by loginScreenViewModel.uiState.collectAsStateWithLifecycle()
+                val signUpScreenViewModel by viewModels<SignUpViewModel>()
+                val signUpUiState by signUpScreenViewModel.uiState.collectAsStateWithLifecycle()
                 val homeScreenViewModel by viewModels<HomeViewModel>()
                 val homeUiState by homeScreenViewModel.uiState.collectAsStateWithLifecycle()
                 val movieViewModel by viewModels<MovieViewModel>()
                 val movieUiState by movieViewModel.uiState.collectAsStateWithLifecycle()
+                val seriesViewModel by viewModels<SerieViewModel>()
+                val seriesUiState by seriesViewModel.uiState.collectAsStateWithLifecycle()
 
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    NavHost(navController = navController, startDestination = Home) {
+                Scaffold(modifier = Modifier.fillMaxSize(),
+//                    bottomBar = {
+//                        BottomNavigationBar(navController = navController)
+//
+//                    }
+                    ) { paddingValues ->
+                    paddingValues.toString()
+                    NavHost(navController = navController, startDestination = Splash) {
+                        composable<Splash> {
+                            SplashScreen(
+                                onNavigateToScreen = {
+                                    navController.popBackStack()
+                                    navController.navigate(Initial)
+                                }
+                            )
+                        }
+
+                        composable<Initial> {
+                            InitialScreen(
+                                modifier = Modifier,
+                                uiState = initialUiState,
+                                onEvent = initialScreenViewModel::onEvent,
+                                onNavigateToLogin = { navController.navigate(Login) },
+                                onLoginGoogle = { navController.navigate(Home) },
+                                onNavigateToSignUp = { navController.navigate(SignUp) }
+                            )
+                        }
+
+                        composable<Login> {
+                            LoginScreen(
+                                modifier = Modifier,
+                                uiState = loginUiState,
+                                onEvent = loginScreenViewModel::onEvent,
+                                onNavigateToHome = { navController.navigate(Home) },
+                                onNavigateToSignUp = { navController.navigate(SignUp) },
+                                onBackClick = { navController.popBackStack() }
+                            )
+                        }
+
+                        composable<SignUp> {
+                            SignUpScreen(
+                                modifier = Modifier,
+                                uiState = signUpUiState,
+                                onEvent = signUpScreenViewModel::onEvent,
+                                onNavigateToHome = { navController.navigate(Home) },
+                                onBackClick = { navController.popBackStack() }
+                            )
+                        }
+
                         composable<Home> {
                             HomeScreen(
-                                modifier = Modifier
-                                    .padding(innerPadding),
+                                modifier = Modifier,
                                 onNavigateToMovie = {
                                     val movieId = it.id
                                     navController.navigate("$Movie/$movieId")
-
+                                },
+                                onNavigateToSerie = {
+                                    val serieId = it.id
+                                    navController.navigate("$Serie/$serieId")
                                 },
                                 uiState = homeUiState,
                                 onEvent = homeScreenViewModel::onEvent
                             )
                         }
-                        composable("$Movie/{movieId}") {
+
+                        composable("$Movie/{movieId}") { it ->
                             val movieId = it.arguments?.getString("movieId")?.toIntOrNull()
                             movieId?.let { id ->
                                 MovieScreen(
@@ -61,13 +131,33 @@ class MainActivity : ComponentActivity() {
                                     movieId = id,
                                     uiState = movieUiState,
                                     onEvent = movieViewModel::onEvent,
+                                    onNavigateToMovie = { movieInfo ->
+                                        val newMovieId = movieInfo.id
+                                        navController.popBackStack()
+                                        navController.navigate("$Movie/$newMovieId")
+                                    },
                                     onBackClick = { navController.popBackStack() }
-
                                 )
                             }
                         }
 
-
+                        composable("$Serie/{serieId}") {
+                            val serieId = it.arguments?.getString("serieId")?.toIntOrNull()
+                            serieId?.let { id ->
+                                SerieScreen(
+                                    modifier = Modifier,
+                                    serieId = id,
+                                    uiState = seriesUiState,
+                                    onEvent = seriesViewModel::onEvent,
+                                    onNavigateToSerie = { serieInfo ->
+                                        val newSerieId = serieInfo.id
+                                        navController.popBackStack()
+                                        navController.navigate("$Serie/$newSerieId")
+                                    },
+                                    onBackClick = { navController.popBackStack() }
+                                )
+                            }
+                        }
                     }
                 }
             }
