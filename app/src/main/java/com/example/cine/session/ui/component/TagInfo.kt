@@ -12,6 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.cine.session.ui.theme.AppTypography
+import com.example.cine.session.ui.theme.Primary
 import com.example.cine.session.ui.theme.Tertiary
 
 @Composable
@@ -27,7 +28,7 @@ fun TagInfo(
                 shape = RoundedCornerShape(50.dp)
             )
             .background(
-                color = Tertiary.copy(alpha = 0.1f),
+                color = Primary.copy(alpha = 0.5f),
                 shape = RoundedCornerShape(50.dp)
             )
     ) {
