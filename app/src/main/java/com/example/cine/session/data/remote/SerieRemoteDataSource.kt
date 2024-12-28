@@ -17,4 +17,5 @@ interface SerieRemoteDataSource {
     suspend fun postFavoriteSerie(sessionId: String, favoriteRequest: FavoriteRequest): Result<FavoriteResponse>
     suspend fun postWatchlistSerie(sessionId: String, favoriteRequest: FavoriteRequest): Result<FavoriteResponse>
     suspend fun searchSeries(query: String, page: Int): Result<ListSeriesResponse>
+    suspend fun getSimilarSeries(serieId: Int, page: Int): Result<ListSeriesResponse>
 }
