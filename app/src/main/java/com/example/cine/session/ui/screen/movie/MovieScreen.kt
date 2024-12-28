@@ -1,7 +1,9 @@
 package com.example.cine.session.ui.screen.movie
 
+import android.content.Intent
 import android.icu.text.DecimalFormat
 import android.icu.text.DecimalFormatSymbols
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,11 +30,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.example.cine.session.R
 import com.example.cine.session.core.network.util.isScreenLandscape
 import com.example.cine.session.core.network.util.minutesToHours
+import com.example.cine.session.data.model.MovieInfo
 import com.example.cine.session.ui.component.CustomButton
 import com.example.cine.session.ui.component.HorizontalList
 import com.example.cine.session.ui.component.ImageButton
@@ -49,12 +54,17 @@ fun MovieScreen(
     movieId: Int,
     uiState: MovieUiState,
     onEvent: (MovieUiEvent) -> Unit,
+    onNavigateToMovie: (MovieInfo) -> Unit,
     onBackClick: () -> Unit
 ) {
+    val context = LocalContext.current
+
     LaunchedEffect(true) {
         onEvent(MovieUiEvent.LoadMovie(movieId))
         onEvent(MovieUiEvent.LoadSimilarMovies(movieId, 1))
     }
+
+    Log.d("MovieScreenDetails", "Response:" + uiState.movie.toString())
 
     val isLandscape = isScreenLandscape()
     val scrollState = rememberLazyListState()
@@ -69,7 +79,9 @@ fun MovieScreen(
             item {
                 ImageFormat(
                     modifier = modifier,
-                    backdropPath = uiState.movie.backdropPath.toString(),
+                    path = if (uiState.movie.backdropPath.isNullOrEmpty())
+                                uiState.movie.posterPath.toString()
+                           else uiState.movie.backdropPath.toString(),
                     isLandscape = isLandscape
                 )
 
@@ -128,7 +140,33 @@ fun MovieScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        CustomButton(text = "Watch Now", onClick = {})
+
+                        if (!uiState.movie.homepage.isNullOrEmpty()) {
+                            CustomButton(
+                                modifier = Modifier.width(180.dp),
+                                borderRadius = 100,
+                                text = "Watch Now",
+                                active = true,
+                                onClick = {
+                                    Intent(Intent.ACTION_VIEW).apply {
+                                        val intent = Intent(
+                                            Intent.ACTION_VIEW,
+                                            Uri.parse(uiState.movie.homepage.toString())
+                                        )
+                                        context.startActivity(intent)
+                                    }
+                                }
+                            )
+                        } else {
+                            CustomButton(
+                                modifier = Modifier.width(180.dp),
+                                borderRadius = 100,
+                                text = "Not Available",
+                                active = false,
+                                onClick = {}
+                            )
+                        }
+
                         ImageButton(
                             image = R.drawable.ic_favorite,
                             activeImage = R.drawable.ic_favorite_active,
@@ -159,9 +197,18 @@ fun MovieScreen(
                     HorizontalList(
                         modifier = Modifier
                             .absoluteOffset(y = if (isLandscape) (-100).dp else (-70).dp),
-                        infos = uiState.similarMovies,
+                        items = uiState.similarMovies,
                         text = "Similar Movies",
-                        onMovieClick = {}
+                        onItemRender = { movie ->
+                            AsyncImage(
+                                model = "https://image.tmdb.org/t/p/original${movie.posterPath}",
+                                contentDescription = "Poster",
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        },
+                        onItemClick = { movie ->
+                            onNavigateToMovie(movie)
+                        }
                     )
                 }
                 Log.d("SimilarMovies", "Response:" + uiState.similarMovies.toString())
