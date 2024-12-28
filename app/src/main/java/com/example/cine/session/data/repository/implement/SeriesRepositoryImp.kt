@@ -49,4 +49,7 @@ class SeriesRepositoryImp @Inject constructor(
 
     override suspend fun searchSeries(query: String, page: Int): ListSeriesResponse =
         serieRremoteDataSource.searchSeries(query, page).getOrThrow()
+
+    override suspend fun getSimilarSeries(serieId: Int, page: Int): ListSeriesResponse =
+        serieRremoteDataSource.getSimilarSeries(serieId, page).getOrThrow()
 }
