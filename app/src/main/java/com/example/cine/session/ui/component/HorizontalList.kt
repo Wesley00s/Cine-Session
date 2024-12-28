@@ -8,21 +8,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.cine.session.data.model.InfoCard
-import com.example.cine.session.data.model.MovieInfo
 import com.example.cine.session.ui.theme.AppTypography
 
 @Composable
-fun HorizontalList(
+fun <T> HorizontalList(
     modifier: Modifier = Modifier,
-    infos: List<MovieInfo?>,
+    items: List<T>,
     text: String,
-    onMovieClick: (MovieInfo) -> Unit
+    onItemRender: @Composable (T) -> Unit,
+    onItemClick: (T) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxWidth()
@@ -40,21 +38,18 @@ fun HorizontalList(
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(horizontal = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-                items(
-                    items = infos,
-                    key = { it?.id ?: 0 }
-                ) { info ->
-                    if (info != null) {
-                        MovieCard(
-                            modifier = Modifier.padding(4.dp),
-                            movieInfo = info,
-                            onClick = {
-                                onMovieClick(it)
-                            }
-                        )
-                    }
+            items(
+                items = items
+            ) { item ->
+                ItemCard(
+                    item = item,
+                    onClick = { onItemClick(it) }
+                ) {
+                    onItemRender(it)
                 }
+            }
         }
     }
 }
