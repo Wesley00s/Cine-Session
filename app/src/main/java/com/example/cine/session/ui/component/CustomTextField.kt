@@ -20,7 +20,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.cine.session.R
-import com.example.cine.session.ui.theme.Primary
 import com.example.cine.session.ui.theme.Secondary
 import com.example.cine.session.ui.theme.Tertiary
 
@@ -28,13 +27,23 @@ import com.example.cine.session.ui.theme.Tertiary
 fun CustomTextField(
     modifier: Modifier = Modifier,
     onValueChange: (String) -> Unit,
-    label: String,
+    label: String? = null,
+    placeholder: String? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
     value: String,
     icon: Int
 ) {
 
     TextField(
         value = value,
+        placeholder = {
+            if (placeholder != null) {
+                Text(text = placeholder, color = Color.Gray)
+            }
+        },
+        trailingIcon = trailingIcon,
+        maxLines = 1,
+        singleLine = true,
         onValueChange = onValueChange,
         modifier = modifier
             .fillMaxWidth()
@@ -44,8 +53,10 @@ fun CustomTextField(
                 RoundedCornerShape(100)
             ),
         shape = RoundedCornerShape(100),
-        label = {
-            Text(text = label, color = Color.Gray)
+        label = if (label != null) {
+            { Text(text = label, color = Color.Gray) }
+        } else {
+            null
         },
         leadingIcon = {
             Icon(painter = painterResource(id = icon), contentDescription = null, tint = Color.Gray)
@@ -55,9 +66,9 @@ fun CustomTextField(
             focusedContainerColor = Secondary,
             unfocusedContainerColor = Secondary,
             unfocusedTextColor = Color.LightGray,
-
             focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
+            unfocusedIndicatorColor = Color.Transparent,
+            cursorColor = Color.LightGray
         )
     )
 }
