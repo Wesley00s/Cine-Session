@@ -6,12 +6,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SeasonInfo (
-    @SerialName("_id") val id: String,
-    @SerialName("air_date") val airDate: String?,
-    val episodes: List<EpisodeResponse>,
-    val name: String,
-    val overview: String?,
-    @SerialName("poster_path") val posterPath: String?,
-    @SerialName("season_number") val seasonNumber: Int,
-    @SerialName("vote_average") val voteAverage: Double
+    @SerialName("_id") val id: String? = null,
+    @SerialName("air_date") val airDate: String? = null,
+    val episodes: List<EpisodeResponse>? = null,
+    val name: String? = null,
+    val overview: String?=  null,
+    @SerialName("still_path") val posterPath: String? = null,
+    @SerialName("season_number") val seasonNumber: Int? = null,
+    @SerialName("vote_average") val voteAverage: Double? = null
 )
