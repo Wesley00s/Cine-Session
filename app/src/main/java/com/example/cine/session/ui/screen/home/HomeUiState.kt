@@ -6,6 +6,9 @@ import com.example.cine.session.data.remote.response.series.ListSeriesResponse
 data class HomeUiState(
     val popularMovies: ListMoviesResponse? = null,
     val topRatedMovies: ListMoviesResponse? = null,
+    val upcomingMovies: ListMoviesResponse? = null,
     val favoritesMovies: ListMoviesResponse? = null,
     val popularSeries: ListSeriesResponse? = null,
+    val topRatedSeries: ListSeriesResponse? = null,
+    val upcomingSeries: ListSeriesResponse? = null
 )
