@@ -1,5 +1,6 @@
 package com.example.cine.session.data.remote.datasource
 
+import android.util.Log
 import com.example.cine.session.BuildConfig
 import com.example.cine.session.data.model.EpisodeInfo
 import com.example.cine.session.data.model.FavoriteRequest
@@ -51,18 +52,19 @@ class KtorSerieRemoteDatasource @Inject constructor(
         Result.failure(e)
     }
 
-    override suspend fun getTopRatedSeries(page: Int): Result<ListSeriesResponse> =
-        try {
-            val response = httpClient
-                .get("$BASE_URL/tv/top_rated?language=en-US&page=$page") {
-                    header("Authorization", "Bearer $TOKEN_API")
-                    header("accept", "application/json")
-                }
-                .body<ListSeriesResponse>()
-            Result.success(response)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+    override suspend fun getTopRatedSeries(page: Int): Result<ListSeriesResponse> = try {
+        val response = httpClient
+            .get("$BASE_URL/tv/top_rated?language=en-US&page=$page") {
+                header("Authorization", "Bearer $TOKEN_API")
+                header("accept", "application/json")
+            }
+            .body<ListSeriesResponse>()
+
+        Log.d("TOP_RATED_SERIES", "getTopRatedSeries: $response")
+        Result.success(response)
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
 
     override suspend fun getDetailsSeason(
         id: Int,
@@ -168,4 +170,16 @@ class KtorSerieRemoteDatasource @Inject constructor(
         } catch (e: Exception) {
             Result.failure(e)
         }
+
+    override suspend fun getUpcomingSeries(page: Int): Result<ListSeriesResponse> = try {
+        val response = httpClient
+            .get("$BASE_URL/tv/upcoming?language=en-US&page=$page") {
+                header("Authorization", "Bearer $TOKEN_API")
+                header("accept", "application/json")
+            }
+            .body<ListSeriesResponse>()
+        Result.success(response)
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
 }

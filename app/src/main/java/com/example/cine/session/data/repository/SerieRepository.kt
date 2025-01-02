@@ -7,7 +7,7 @@ import com.example.cine.session.data.model.SeasonInfo
 import com.example.cine.session.data.model.SerieInfo
 import com.example.cine.session.data.remote.response.series.ListSeriesResponse
 
-interface SeriesRepository {
+interface SerieRepository {
     suspend fun getDetailsSeries(id: Int): SerieInfo
     suspend fun getPopularSeries(page: Int): ListSeriesResponse
     suspend fun getTopRatedSeries(page: Int): ListSeriesResponse
@@ -18,4 +18,5 @@ interface SeriesRepository {
     suspend fun postWatchlistSerie(sessionId: String, favoriteRequest: FavoriteRequest): FavoriteResponse
     suspend fun searchSeries(query: String, page: Int): ListSeriesResponse
     suspend fun getSimilarSeries(serieId: Int, page: Int): ListSeriesResponse
+    suspend fun getUpcomingSeries(page: Int): ListSeriesResponse
 }
