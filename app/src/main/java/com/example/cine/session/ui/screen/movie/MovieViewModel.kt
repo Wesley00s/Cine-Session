@@ -25,6 +25,7 @@ class MovieViewModel @Inject constructor(
         when (event) {
             is MovieUiEvent.LoadMovie -> loadMovie(event.movieId)
             is MovieUiEvent.LoadSimilarMovies -> loadSimilarMovies(event.movieId, event.page)
+            is MovieUiEvent.LoadUpcomingMovies -> loadUpcomingMovies(event.page)
         }
     }
 
@@ -58,11 +59,18 @@ class MovieViewModel @Inject constructor(
                             genres = it.genreIds.map { id -> MappedGenre.fromId(id) }
                         )
                     }
-
-                Log.d("SimilarMovies_ViewModel", "Response:$similarMovies")
-
                 currentUiState.copy(
                     similarMovies = similarMovies
+                )
+            }
+        }
+    }
+
+    private fun loadUpcomingMovies(page: Int) {
+        viewModelScope.launch {
+            _uiState.update { currentUiState ->
+                currentUiState.copy(
+                    upcomingMovies = movieRepository.getUpcomingMovies(page)
                 )
             }
         }

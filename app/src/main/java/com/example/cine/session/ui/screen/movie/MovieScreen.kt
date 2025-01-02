@@ -39,7 +39,7 @@ import com.example.cine.session.core.network.util.isScreenLandscape
 import com.example.cine.session.core.network.util.minutesToHours
 import com.example.cine.session.data.model.MovieInfo
 import com.example.cine.session.ui.component.CustomButton
-import com.example.cine.session.ui.component.HorizontalList
+import com.example.cine.session.ui.component.MovieHorizontalList
 import com.example.cine.session.ui.component.ImageButton
 import com.example.cine.session.ui.component.ImageFormat
 import com.example.cine.session.ui.component.TagInfo
@@ -64,12 +64,10 @@ fun MovieScreen(
         onEvent(MovieUiEvent.LoadSimilarMovies(movieId, 1))
     }
 
-    Log.d("MovieScreenDetails", "Response:" + uiState.movie.toString())
-
     val isLandscape = isScreenLandscape()
     val scrollState = rememberLazyListState()
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier) {
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
@@ -78,22 +76,22 @@ fun MovieScreen(
         ) {
             item {
                 ImageFormat(
-                    modifier = modifier,
+                    modifier = Modifier,
                     path = if (uiState.movie.backdropPath.isNullOrEmpty())
-                                uiState.movie.posterPath.toString()
-                           else uiState.movie.backdropPath.toString(),
+                        uiState.movie.posterPath.toString()
+                    else uiState.movie.backdropPath.toString(),
                     isLandscape = isLandscape
                 )
 
                 Column(
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = 16.dp)
                         .offset(y = if (isLandscape) (-250).dp else (-150).dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Row(
-                        modifier = modifier.fillMaxSize(),
+                        modifier = Modifier.fillMaxSize(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -194,26 +192,18 @@ fun MovieScreen(
                 }
 
                 if (!uiState.similarMovies.isNullOrEmpty()) {
-                    HorizontalList(
+                    MovieHorizontalList(
                         modifier = Modifier
                             .absoluteOffset(y = if (isLandscape) (-100).dp else (-70).dp),
-                        items = uiState.similarMovies,
+                        movies = uiState.similarMovies,
                         text = "Similar Movies",
-                        onItemRender = { movie ->
-                            AsyncImage(
-                                model = "https://image.tmdb.org/t/p/original${movie.posterPath}",
-                                contentDescription = "Poster",
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        },
-                        onItemClick = { movie ->
-                            onNavigateToMovie(movie)
-                        }
+                        onItemClick = onNavigateToMovie,
+                        onViewAllMovies = {}
                     )
                 }
-                Log.d("SimilarMovies", "Response:" + uiState.similarMovies.toString())
             }
         }
+
         ImageButton(
             modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 32.dp)
