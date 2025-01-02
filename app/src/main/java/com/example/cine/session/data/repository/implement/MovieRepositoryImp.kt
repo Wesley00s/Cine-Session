@@ -41,4 +41,8 @@ class MovieRepositoryImp @Inject constructor(
     override suspend fun getSimilarMovies(id: Int, page: Int): ListMoviesResponse =
         movieRemoteDataSource.getSimilarMovies(id, page).getOrThrow()
 
+    override suspend fun getUpcomingMovies(page: Int): ListMoviesResponse =
+        movieRemoteDataSource.getUpcomingMovies(page).getOrThrow()
+
+
 }

@@ -136,4 +136,16 @@ class KtorMovieRemoteDatasource @Inject constructor(
     } catch (e: Exception) {
         Result.failure(e)
     }
+
+    override suspend fun getUpcomingMovies(page: Int): Result<ListMoviesResponse> = try {
+        val response = httpClient
+            .get("$BASE_URL/movie/upcoming?language=en-US&page=$page") {
+                header("Authorization", "Bearer $TOKEN_API")
+                header("accept", "application/json")
+            }
+            .body<ListMoviesResponse>()
+        Result.success(response)
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
 }

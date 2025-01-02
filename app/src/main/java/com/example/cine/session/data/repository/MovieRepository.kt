@@ -14,5 +14,5 @@ interface MovieRepository {
     suspend fun postWatchlistMovie(sessionId: String, favoriteRequest: FavoriteRequest): FavoriteResponse
     suspend fun searchMovies(query: String, page: Int): ListMoviesResponse
     suspend fun getSimilarMovies(id: Int, page: Int): ListMoviesResponse
-
+    suspend fun getUpcomingMovies(page: Int): ListMoviesResponse
 }

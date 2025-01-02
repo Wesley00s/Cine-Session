@@ -14,4 +14,5 @@ interface MovieRemoteDataSource {
     suspend fun postWatchlistMovie(sessionId: String, favoriteRequest: FavoriteRequest): Result<FavoriteResponse>
     suspend fun searchMovies(query: String, page: Int): Result<ListMoviesResponse>
     suspend fun getSimilarMovies(id: Int, page: Int): Result<ListMoviesResponse>
+    suspend fun getUpcomingMovies(page: Int): Result<ListMoviesResponse>
 }
