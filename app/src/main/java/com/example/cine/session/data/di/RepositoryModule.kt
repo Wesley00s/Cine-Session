@@ -1,9 +1,11 @@
 package com.example.cine.session.data.di
 
 import com.example.cine.session.data.repository.MovieRepository
-import com.example.cine.session.data.repository.SeriesRepository
+import com.example.cine.session.data.repository.SeasonRepository
+import com.example.cine.session.data.repository.SerieRepository
 import com.example.cine.session.data.repository.implement.MovieRepositoryImp
-import com.example.cine.session.data.repository.implement.SeriesRepositoryImp
+import com.example.cine.session.data.repository.implement.SeasonRepositoryImp
+import com.example.cine.session.data.repository.implement.SerieRepositoryImp
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -19,6 +21,11 @@ interface RepositoryModule {
 
     @Binds
     fun bindSerieRepository(
-        detailsSeriesRepositoryImplement: SeriesRepositoryImp
-    ): SeriesRepository
+        detailsSeriesRepositoryImplement: SerieRepositoryImp
+    ): SerieRepository
+
+    @Binds
+    fun bindSeasonRepository(
+        detailsSeasonRepositoryImplement: SeasonRepositoryImp
+    ): SeasonRepository
 }
