@@ -24,7 +24,7 @@ data class SerieInfo(
     val popularity: Double? = null,
     @SerialName("poster_path") val posterPath: String? = null,
     @SerialName("production_countries") val productionCountries: List<ProductionCountryResponse>? = null,
-    val seasons: List<SeasonResponse>? = null,
+    var seasons: List<SeasonResponse>? = null,
     val tagline: String? = null,
     @SerialName("vote_average") val voteAverage: Double? = null,
     @SerialName("vote_count") val voteCount: Int? = null
