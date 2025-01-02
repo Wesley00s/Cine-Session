@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cine.session.data.model.SerieInfo
 import com.example.cine.session.data.model.enumeration.MappedGenre
-import com.example.cine.session.data.repository.SeriesRepository
+import com.example.cine.session.data.repository.SerieRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SerieViewModel @Inject constructor(
-    private val repository: SeriesRepository
+    private val repository: SerieRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SerieUiState())
     val uiState: StateFlow<SerieUiState> = _uiState.asStateFlow()
