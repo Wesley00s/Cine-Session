@@ -21,7 +21,6 @@ class KtorMovieRemoteDatasource @Inject constructor(
     private val httpClient: HttpClient
 ) : MovieRemoteDataSource {
     companion object {
-        private val httpClient: KtorHttpClient = KtorHttpClient
         const val BASE_URL = BuildConfig.BASE_URL
         const val TOKEN_API = BuildConfig.API_KEY
         const val ACCOUNT_ID = BuildConfig.ACCOUNT_ID
