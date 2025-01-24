@@ -53,6 +53,6 @@ class SerieRepositoryImp @Inject constructor(
     override suspend fun getSimilarSeries(serieId: Int, page: Int): ListSeriesResponse =
         serieRemoteDataSource.getSimilarSeries(serieId, page).getOrThrow()
 
-    override suspend fun getUpcomingSeries(page: Int): ListSeriesResponse =
-        serieRemoteDataSource.getUpcomingSeries(page).getOrThrow()
+    override suspend fun getAiringTodaySeries(page: Int): ListSeriesResponse =
+        serieRemoteDataSource.getAiringTodaySeries(page).getOrThrow()
 }

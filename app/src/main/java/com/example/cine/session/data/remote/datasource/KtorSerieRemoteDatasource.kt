@@ -171,9 +171,9 @@ class KtorSerieRemoteDatasource @Inject constructor(
             Result.failure(e)
         }
 
-    override suspend fun getUpcomingSeries(page: Int): Result<ListSeriesResponse> = try {
+    override suspend fun getAiringTodaySeries(page: Int): Result<ListSeriesResponse> = try {
         val response = httpClient
-            .get("$BASE_URL/tv/upcoming?language=en-US&page=$page") {
+            .get("$BASE_URL/tv/airing_today?language=en-US&page=$page") {
                 header("Authorization", "Bearer $TOKEN_API")
                 header("accept", "application/json")
             }

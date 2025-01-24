@@ -18,5 +18,5 @@ interface SerieRepository {
     suspend fun postWatchlistSerie(sessionId: String, favoriteRequest: FavoriteRequest): FavoriteResponse
     suspend fun searchSeries(query: String, page: Int): ListSeriesResponse
     suspend fun getSimilarSeries(serieId: Int, page: Int): ListSeriesResponse
-    suspend fun getUpcomingSeries(page: Int): ListSeriesResponse
+    suspend fun getAiringTodaySeries(page: Int): ListSeriesResponse
 }

@@ -31,5 +31,5 @@ interface SerieRemoteDataSource {
 
     suspend fun searchSeries(query: String, page: Int): Result<ListSeriesResponse>
     suspend fun getSimilarSeries(serieId: Int, page: Int): Result<ListSeriesResponse>
-    suspend fun getUpcomingSeries(page: Int): Result<ListSeriesResponse>
+    suspend fun getAiringTodaySeries(page: Int): Result<ListSeriesResponse>
 }

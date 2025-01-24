@@ -22,7 +22,7 @@ class TVShowViewModel @Inject constructor(
         when (event) {
             is TVShowUiEvent.LoadPopularSeries -> loadPopularSeries(event.page)
             is TVShowUiEvent.LoadTopRatedSeries -> loadTopRatedSeries(event.page)
-            is TVShowUiEvent.LoadUpcomingSeries -> loadUpcomingSeries(event.page)
+            is TVShowUiEvent.LoadAiringTodaySeries -> loadAiringTodaySeries(event.page)
         }
     }
 
@@ -47,11 +47,11 @@ class TVShowViewModel @Inject constructor(
         }
     }
 
-    private fun loadUpcomingSeries(page: Int) {
+    private fun loadAiringTodaySeries(page: Int) {
         viewModelScope.launch {
             _uiState.update { currentUiState ->
                 currentUiState.copy(
-                    upcomingSeries = serieRepository.getUpcomingSeries(page)
+                    upcomingSeries = serieRepository.getAiringTodaySeries(page)
                 )
             }
         }
