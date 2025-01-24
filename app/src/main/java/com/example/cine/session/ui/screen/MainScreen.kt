@@ -1,8 +1,13 @@
 package com.example.cine.session.ui.screen
 
+import android.net.Uri
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -13,12 +18,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.cine.session.R
+import com.example.cine.session.data.remote.response.movie.ListMoviesResponse
+import com.example.cine.session.data.remote.response.series.ListSeriesResponse
 import com.example.cine.session.ui.component.NavItem
 import com.example.cine.session.ui.screen.home.HomeScreen
 import com.example.cine.session.ui.screen.home.HomeViewModel
@@ -26,10 +37,9 @@ import com.example.cine.session.ui.screen.initial.InitialScreen
 import com.example.cine.session.ui.screen.initial.InitialViewModel
 import com.example.cine.session.ui.screen.login.LoginScreen
 import com.example.cine.session.ui.screen.login.LoginViewModel
+import com.example.cine.session.ui.screen.movie.AllMoviesScreen
 import com.example.cine.session.ui.screen.movie.MovieScreen
 import com.example.cine.session.ui.screen.movie.MovieViewModel
-import com.example.cine.session.ui.screen.movie.all.AllMoviesScreen
-import com.example.cine.session.ui.screen.movie.all.AllMoviesViewModel
 import com.example.cine.session.ui.screen.search.SearchScreen
 import com.example.cine.session.ui.screen.search.SearchViewModel
 import com.example.cine.session.ui.screen.serie.SerieScreen
@@ -38,11 +48,16 @@ import com.example.cine.session.ui.screen.serie.season.SeasonViewModel
 import com.example.cine.session.ui.screen.signup.SignUpScreen
 import com.example.cine.session.ui.screen.signup.SignUpViewModel
 import com.example.cine.session.ui.screen.splash.SplashScreen
+import com.example.cine.session.ui.screen.tv_show.AllTVShowsScreen
 import com.example.cine.session.ui.screen.tv_show.TVShowScreen
 import com.example.cine.session.ui.screen.tv_show.TVShowViewModel
 import com.example.cine.session.ui.theme.Primary
+import com.example.cine.session.ui.theme.Quaternary
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
@@ -54,13 +69,12 @@ fun MainScreen(
     movieViewModel: MovieViewModel,
     serieViewModel: SerieViewModel,
     seasonViewModel: SeasonViewModel,
-    tvShowViewModel: TVShowViewModel,
-    allMoviesViewModel: AllMoviesViewModel
+    tvShowViewModel: TVShowViewModel
+
 ) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
-
 
     val navItems = listOf(
         NavItem(
@@ -90,7 +104,7 @@ fun MainScreen(
     )
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         containerColor = Primary,
         bottomBar = {
             val noBottomBarRoutes =
@@ -101,11 +115,14 @@ fun MainScreen(
                     "SignUp",
                     "Movie/{movieId}",
                     "Serie/{serieId}",
-                    "AllMovies"
+                    "AllMovies/{listMoviesResponse}",
+                    "AllSeries/{listSeriesResponse}",
                 )
 
             if (currentRoute !in noBottomBarRoutes) {
-                NavigationBar {
+                NavigationBar(
+                    modifier = Modifier.height(65.dp),
+                ) {
                     navItems.forEachIndexed { _, item ->
                         NavigationBarItem(
                             colors = NavigationBarItemDefaults.colors(
@@ -127,6 +144,7 @@ fun MainScreen(
                             },
                             icon = {
                                 Image(
+                                    modifier = Modifier.size(18.dp),
                                     painter = painterResource(
                                         id = if (currentRoute == item.route) item.imageSelected else item.image
                                     ),
@@ -135,7 +153,7 @@ fun MainScreen(
                             },
                             label = {
                                 if (currentRoute == item.route) {
-                                    Text(text = item.label)
+                                    Text(text = item.label, color = Quaternary, fontSize = 12.sp)
                                 }
                             }
                         )
@@ -165,7 +183,8 @@ fun MainScreen(
                     uiState = initialUiState,
                     onEvent = initialScreenViewModel::onEvent,
                     onNavigateToLogin = { navController.navigate("Login") },
-                    onLoginGoogle = { navController.navigate("Home") },
+                    onLoginGoogle = {
+                    },
                     onNavigateToSignUp = { navController.navigate("SignUp") }
                 )
             }
@@ -204,7 +223,9 @@ fun MainScreen(
                     uiState = homeUiState,
                     onEvent = homeScreenViewModel::onEvent,
                     onViewAllMovies = {
-                        navController.navigate("AllMovies")
+                        val json = Json.encodeToString(it)
+                        val encodedJson = Uri.encode(json)
+                        navController.navigate("AllMovies/$encodedJson")
                     }
                 )
             }
@@ -273,23 +294,55 @@ fun MainScreen(
                         navController.navigate("Serie/$serieId")
                     },
                     onViewAllSeries = {
-                        navController.navigate("AllSeries")
+                        val json = Json.encodeToString(it)
+                        val encodedJson = Uri.encode(json)
+                        navController.navigate("AllSeries/$encodedJson")
                     }
                 )
             }
 
-            composable("AllMovies") {
-                val allMoviesUiState by allMoviesViewModel.uiState.collectAsStateWithLifecycle()
-                AllMoviesScreen(
-                    modifier = Modifier,
-                    uiState = allMoviesUiState,
-                    onEvent = allMoviesViewModel::onEvent,
-                    onNavigateToMovie = {
-                        val movieId = it.id
-                        navController.navigate("Movie/$movieId")
-                    },
-                    onBackClick = navController::popBackStack
-                )
+            composable(
+                "AllMovies/{listMoviesResponse}",
+                arguments = listOf(navArgument("listMoviesResponse") { type = NavType.StringType })
+            ) { navBackStackEntry ->
+                val json = navBackStackEntry.arguments?.getString("listMoviesResponse")
+                val decodedJson = json?.let { Uri.decode(it) }
+                val listMoviesResponse =
+                    decodedJson?.let { Json.decodeFromString<ListMoviesResponse>(it) }
+
+                listMoviesResponse?.let { response ->
+                    AllMoviesScreen(
+                        modifier = Modifier,
+                        onNavigateToMovie = { movie ->
+                            val movieId = movie.id
+                            navController.navigate("Movie/$movieId")
+                        },
+                        listMoviesResponse = response,
+                        onBackClick = navController::popBackStack,
+                    )
+                }
+            }
+
+            composable(
+                "AllSeries/{listSeriesResponse}",
+                arguments = listOf(navArgument("listSeriesResponse") { type = NavType.StringType })
+            ) { navBackStackEntry ->
+                val json = navBackStackEntry.arguments?.getString("listSeriesResponse")
+                val decodedJson = json?.let { Uri.decode(it) }
+                val listSeriesResponse =
+                    decodedJson?.let { Json.decodeFromString<ListSeriesResponse>(it) }
+
+                listSeriesResponse?.let { response ->
+                    AllTVShowsScreen(
+                        modifier = Modifier,
+                        onNavigateToSerie = { serie ->
+                            val serieId = serie.id
+                            navController.navigate("Serie/$serieId")
+                        },
+                        listSeriesResponse = response,
+                        onBackClick = navController::popBackStack
+                    )
+                }
             }
         }
     }
