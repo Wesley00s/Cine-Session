@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ListSeriesResponse(
     val results: List<SerieItemResponse>
-)
+) : java.io.Serializable
 
 @Serializable
 data class SerieItemResponse(
@@ -24,4 +24,4 @@ data class SerieItemResponse(
     @SerialName("poster_path") val posterPath: String?,
     @SerialName("vote_average") val voteAverage: Double,
     @SerialName("vote_count") val voteCount: Int
-)
+) : java.io.Serializable
