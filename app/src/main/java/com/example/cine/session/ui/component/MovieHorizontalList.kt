@@ -27,6 +27,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.cine.session.R
 import com.example.cine.session.data.model.MovieInfo
+import com.example.cine.session.data.remote.response.movie.ListMoviesResponse
+import com.example.cine.session.data.remote.response.movie.MovieItemResponse
 import com.example.cine.session.ui.theme.AppTypography
 import com.example.cine.session.ui.theme.Tertiary
 import java.util.Locale
@@ -37,7 +39,7 @@ fun MovieHorizontalList(
     movies: List<MovieInfo>,
     text: String,
     onItemClick: (MovieInfo) -> Unit,
-    onViewAllMovies: (List<MovieInfo>) -> Unit
+    onViewAllMovies: (ListMoviesResponse) -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxWidth()
@@ -55,7 +57,28 @@ fun MovieHorizontalList(
                 style = AppTypography.labelLarge,
                 modifier = Modifier
                     .clickable {
-                        onViewAllMovies(movies)
+                        val response = ListMoviesResponse(
+                            results = movies.map {
+                                MovieItemResponse(
+                                    id = it.id ?: 0,
+                                    posterPath = it.posterPath,
+                                    title = it.title ?: "",
+                                    overview = it.overview ?: "",
+                                    releaseDate = it.releaseDate ?: "",
+                                    voteAverage = it.voteAverage ?: 0.0,
+                                    voteCount = it.voteCount ?: 0,
+                                    backdropPath = it.backdropPath ?: "",
+                                    originalTitle = it.originalTitle ?: "",
+                                    popularity = it.popularity ?: 0.0,
+                                    adult = false,
+                                    genreIds = it.genresIds ?: emptyList(),
+                                    originalLanguage = "",
+                                    video = false,
+                                )
+
+                            }
+                        )
+                        onViewAllMovies(response)
                     }
             )
         }
@@ -84,7 +107,7 @@ fun MovieHorizontalList(
                                 spotColor = Color.Black
                             )
                             .background(
-                                Color.LightGray.copy(alpha = 0.3f),
+                                Color.Gray.copy(alpha = 0.3f),
                                 shape = RoundedCornerShape(50.dp)
                             ),
                         horizontalArrangement = Arrangement.spacedBy(2.dp),
