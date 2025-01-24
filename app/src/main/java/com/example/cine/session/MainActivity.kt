@@ -1,16 +1,17 @@
 package com.example.cine.session
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import com.example.cine.session.ui.screen.MainScreen
 import com.example.cine.session.ui.screen.home.HomeViewModel
 import com.example.cine.session.ui.screen.initial.InitialViewModel
 import com.example.cine.session.ui.screen.login.LoginViewModel
 import com.example.cine.session.ui.screen.movie.MovieViewModel
-import com.example.cine.session.ui.screen.movie.all.AllMoviesViewModel
 import com.example.cine.session.ui.screen.search.SearchViewModel
 import com.example.cine.session.ui.screen.serie.SerieViewModel
 import com.example.cine.session.ui.screen.serie.season.SeasonViewModel
@@ -22,6 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -36,7 +38,6 @@ class MainActivity : ComponentActivity() {
                 val homeScreenViewModel by viewModels<HomeViewModel>()
                 val searchViewModel by viewModels<SearchViewModel>()
                 val tvShowViewModel by viewModels<TVShowViewModel>()
-                val allMoviesViewModel by viewModels<AllMoviesViewModel>()
 
                 MainScreen(
                     initialScreenViewModel = initialScreenViewModel,
@@ -47,8 +48,7 @@ class MainActivity : ComponentActivity() {
                     movieViewModel = movieViewModel,
                     serieViewModel = serieViewModel,
                     seasonViewModel = seasonViewModel,
-                    tvShowViewModel = tvShowViewModel,
-                    allMoviesViewModel = allMoviesViewModel
+                    tvShowViewModel = tvShowViewModel
                 )
             }
         }
