@@ -4,7 +4,6 @@ import android.content.Intent
 import android.icu.text.DecimalFormat
 import android.icu.text.DecimalFormatSymbols
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,7 +22,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,7 +45,6 @@ import com.example.cine.session.ui.screen.serie.season.SeasonScreen
 import com.example.cine.session.ui.screen.serie.season.SeasonUiEvent
 import com.example.cine.session.ui.screen.serie.season.SeasonViewModel
 import com.example.cine.session.ui.theme.AppTypography
-import com.example.cine.session.ui.theme.Primary
 import java.util.Locale
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -82,179 +79,170 @@ fun SerieScreen(
     val scrollState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-    Log.d("_SerieScreen", "Serie: ${uiState.serie}")
+    Box(modifier = modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize(),
+            state = scrollState
+        ) {
+            item {
+                ImageFormat(
+                    modifier = Modifier,
+                    path = if (uiState.serie.backdropPath.isNullOrEmpty())
+                        uiState.serie.posterPath.toString()
+                    else uiState.serie.backdropPath.toString(),
+                    isLandscape = isLandscape
+                )
 
-
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        containerColor = Primary
-
-    ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
-            LazyColumn(
-                modifier = modifier
-                    .fillMaxSize(),
-                state = scrollState
-            ) {
-                item {
-                    ImageFormat(
-                        modifier = Modifier,
-                        path = if (uiState.serie.backdropPath.isNullOrEmpty())
-                            uiState.serie.posterPath.toString()
-                        else uiState.serie.backdropPath.toString(),
-                        isLandscape = isLandscape
-                    )
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 16.dp)
-                            .offset(y = if (isLandscape) (-250).dp else (-150).dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                        .offset(y = if (isLandscape) (-250).dp else (-150).dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_imdb_logo),
-                                contentDescription = "IMDb Logo"
-                            )
-                            Text(
-                                text = DecimalFormat(
-                                    "#.##",
-                                    DecimalFormatSymbols(Locale.US)
-                                ).format(uiState.serie.voteAverage ?: 0.0),
-                                style = AppTypography.headlineMedium,
-                                color = Color.White
-                            )
-                        }
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_imdb_logo),
+                            contentDescription = "IMDb Logo"
+                        )
                         Text(
-                            text = uiState.serie.name.toString(),
-                            style = AppTypography.displaySmall,
+                            text = DecimalFormat(
+                                "#.##",
+                                DecimalFormatSymbols(Locale.US)
+                            ).format(uiState.serie.voteAverage ?: 0.0),
+                            style = AppTypography.headlineMedium,
                             color = Color.White
                         )
-
-                        FlowRow(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            overflow = FlowRowOverflow.Visible
-                        ) {
-                            val year = uiState.serie.firstAirDate.toString().take(4)
-                            TagInfo(tag = year)
-
-                            uiState.serie.genres?.forEach {
-                                TagInfo(tag = it.name)
-                            }
-
-                            uiState.serie.originCountry?.forEach {
-                                TagInfo(tag = it)
-                            }
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .width(390.dp)
-                                .defaultMinSize(700.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-
-                            if (!uiState.serie.homepage.isNullOrEmpty()) {
-                                CustomButton(
-                                    modifier = Modifier.width(180.dp),
-                                    borderRadius = 100,
-                                    text = "Watch Now",
-                                    active = true,
-                                    onClick = {
-                                        Intent(Intent.ACTION_VIEW).apply {
-                                            val intent = Intent(
-                                                Intent.ACTION_VIEW,
-                                                Uri.parse(uiState.serie.homepage.toString())
-                                            )
-                                            context.startActivity(intent)
-                                        }
-                                    }
-                                )
-                            } else {
-                                CustomButton(
-                                    modifier = Modifier.width(180.dp),
-                                    borderRadius = 100,
-                                    text = "Not Available",
-                                    active = false,
-                                    onClick = {}
-                                )
-                            }
-
-                            ImageButton(
-                                image = R.drawable.ic_favorite,
-                                activeImage = R.drawable.ic_favorite_active,
-                                toggleEnabled = true,
-                                onClick = {})
-                            ImageButton(image = R.drawable.ic_download, onClick = {})
-                            ImageButton(image = R.drawable.ic_share, onClick = {})
-                        }
-
-                        Spacer(modifier = Modifier)
-
-                        Text(
-                            text = uiState.serie.overview.toString(),
-                            style = AppTypography.bodyLarge,
-                            color = Color.LightGray
-                        )
                     }
-                }
-                item {
-                    val tabs = uiState.serie.seasons?.map { it.name } ?: emptyList()
-                    val pages: List<@Composable () -> Unit> = uiState.serie.seasons?.map { season ->
-                        {
-                            SeasonScreen(
-                                modifier = Modifier.fillMaxSize(),
-                                serieId = serieId,
-                                uiState = seasonUiState,
-                                onEvent = {
-                                    seasonUiEvent(
-                                        SeasonUiEvent.LoadSeason(
-                                            serieId,
-                                            season.seasonNumber
-                                        )
-                                    )
-                                }
-                            )
-                        }
-                    } ?: listOf {
-                        Text(
-                            "No Seasons Available",
-                            style = AppTypography.bodyLarge,
-                            color = Color.Gray
-                        )
-                    }
-
-                    TabLayout(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .offset(y = (-120).dp),
-                        coroutineScope = coroutineScope,
-                        tabs = tabs,
-                        pages = pages,
-                        pagerState = pagerState
+                    Text(
+                        text = uiState.serie.name.toString(),
+                        style = AppTypography.displaySmall,
+                        color = Color.White
                     )
 
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        overflow = FlowRowOverflow.Visible
+                    ) {
+                        val year = uiState.serie.firstAirDate.toString().take(4)
+                        TagInfo(tag = year)
+
+                        uiState.serie.genres?.forEach {
+                            TagInfo(tag = it.name)
+                        }
+
+                        uiState.serie.originCountry?.forEach {
+                            TagInfo(tag = it)
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .width(390.dp)
+                            .defaultMinSize(700.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        if (!uiState.serie.homepage.isNullOrEmpty()) {
+                            CustomButton(
+                                modifier = Modifier.width(180.dp),
+                                borderRadius = 100,
+                                text = "Watch Now",
+                                active = true,
+                                onClick = {
+                                    Intent(Intent.ACTION_VIEW).apply {
+                                        val intent = Intent(
+                                            Intent.ACTION_VIEW,
+                                            Uri.parse(uiState.serie.homepage.toString())
+                                        )
+                                        context.startActivity(intent)
+                                    }
+                                }
+                            )
+                        } else {
+                            CustomButton(
+                                modifier = Modifier.width(180.dp),
+                                borderRadius = 100,
+                                text = "Not Available",
+                                active = false,
+                                onClick = {}
+                            )
+                        }
+
+                        ImageButton(
+                            image = R.drawable.ic_favorite,
+                            activeImage = R.drawable.ic_favorite_active,
+                            toggleEnabled = true,
+                            onClick = {})
+                        ImageButton(image = R.drawable.ic_download, onClick = {})
+                        ImageButton(image = R.drawable.ic_share, onClick = {})
+                    }
+
+                    Spacer(modifier = Modifier)
+
+                    Text(
+                        text = uiState.serie.overview.toString(),
+                        style = AppTypography.bodyLarge,
+                        color = Color.LightGray
+                    )
                 }
             }
-            ImageButton(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 32.dp)
-                    .align(Alignment.TopStart)
-                    .size(40.dp),
-                image = R.drawable.ic_back,
-                onClick = {
-                    uiState.serie.seasons = null
-                    seasonUiState.season = null
-                    onBackClick()
+            item {
+                val tabs = uiState.serie.seasons?.map { it.name } ?: emptyList()
+                val pages: List<@Composable () -> Unit> = uiState.serie.seasons?.map { season ->
+                    {
+                        SeasonScreen(
+                            modifier = Modifier.fillMaxSize(),
+                            serieId = serieId,
+                            uiState = seasonUiState,
+                            onEvent = {
+                                seasonUiEvent(
+                                    SeasonUiEvent.LoadSeason(
+                                        serieId,
+                                        season.seasonNumber
+                                    )
+                                )
+                            }
+                        )
+                    }
+                } ?: listOf {
+                    Text(
+                        "No Seasons Available",
+                        style = AppTypography.bodyLarge,
+                        color = Color.Gray
+                    )
                 }
-            )
+
+                TabLayout(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .offset(y = (-120).dp),
+                    coroutineScope = coroutineScope,
+                    tabs = tabs,
+                    pages = pages,
+                    pagerState = pagerState
+                )
+
+            }
         }
+        ImageButton(
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 32.dp)
+                .align(Alignment.TopStart)
+                .size(40.dp),
+            image = R.drawable.ic_back,
+            onClick = {
+                uiState.serie.seasons = null
+                seasonUiState.season = null
+                onBackClick()
+            }
+        )
     }
 }
