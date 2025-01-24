@@ -1,6 +1,8 @@
 package com.example.cine.session.ui.screen.tv_show
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,14 +28,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.cine.session.core.network.util.isScreenLandscape
 import com.example.cine.session.data.model.SerieInfo
-import com.example.cine.session.ui.component.AnimatedCarousel
-import com.example.cine.session.ui.component.MovieHorizontalList
+import com.example.cine.session.data.remote.response.series.ListSeriesResponse
+import com.example.cine.session.ui.component.Carousel
 import com.example.cine.session.ui.component.ImageFormat
 import com.example.cine.session.ui.component.SerieHorizontalList
 import com.example.cine.session.ui.theme.AppTypography
@@ -42,13 +48,13 @@ fun TVShowScreen(
     uiState: TVShowUiState,
     onEvent: (TVShowUiEvent) -> Unit,
     onNavigateToSerie: (SerieInfo) -> Unit,
-    onViewAllSeries: (List<SerieInfo>) -> Unit
+    onViewAllSeries: (ListSeriesResponse) -> Unit
 ) {
 
     LaunchedEffect(true) {
         onEvent(TVShowUiEvent.LoadPopularSeries(1))
         onEvent(TVShowUiEvent.LoadTopRatedSeries(1))
-//        onEvent(TVShowUiEvent.LoadUpcomingSeries(1))
+        onEvent(TVShowUiEvent.LoadAiringTodaySeries(1))
     }
 
     val scrollState = rememberLazyListState()
@@ -61,7 +67,7 @@ fun TVShowScreen(
 
             var popularSeriesInfo by remember { mutableStateOf<List<SerieInfo>?>(null) }
             var topRatedSeriesInfo by remember { mutableStateOf<List<SerieInfo>?>(null) }
-//            var upcomingSeriesInfo by remember { mutableStateOf<List<SerieInfo>?>(null) }
+            var upcomingSeriesInfo by remember { mutableStateOf<List<SerieInfo>?>(null) }
 
             popularSeriesInfo = uiState.popularSeries?.let {
                 it.results.let { results ->
@@ -99,23 +105,23 @@ fun TVShowScreen(
                 }
             }
 
-//            upcomingSeriesInfo = uiState.upcomingSeries?.let {
-//                it.results.let { results ->
-//                    results.map { result ->
-//                        SerieInfo(
-//                            id = result.id,
-//                            posterPath = result.posterPath,
-//                            name = result.name,
-//                            overview = result.overview,
-//                            voteAverage = result.voteAverage,
-//                            voteCount = result.voteCount,
-//                            backdropPath = result.backdropPath,
-//                            originalName = result.originalName,
-//                            popularity = result.popularity,
-//                        )
-//                    }
-//                }
-//            }
+            upcomingSeriesInfo = uiState.upcomingSeries?.let {
+                it.results.let { results ->
+                    results.map { result ->
+                        SerieInfo(
+                            id = result.id,
+                            posterPath = result.posterPath,
+                            name = result.name,
+                            overview = result.overview,
+                            voteAverage = result.voteAverage,
+                            voteCount = result.voteCount,
+                            backdropPath = result.backdropPath,
+                            originalName = result.originalName,
+                            popularity = result.popularity,
+                        )
+                    }
+                }
+            }
 
             if (popularSeriesInfo.isNullOrEmpty()) {
                 Box(
@@ -135,23 +141,37 @@ fun TVShowScreen(
             } else {
 
                 if (!popularSeriesInfo.isNullOrEmpty())
-                    AnimatedCarousel(
+                    Carousel(
                         modifier = Modifier,
                         items = popularSeriesInfo.orEmpty(),
-                        onItemClick = onNavigateToSerie
+//                        onItemClick = onNavigateToSerie
 
-                    ) { movie, animatedScale ->
-                        ImageFormat(
-                            path = "https://image.tmdb.org/t/p/original${movie.backdropPath}",
-                            isLandscape = isScreenLandscape(),
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .graphicsLayer(
-                                    scaleX = animatedScale.value,
-                                    scaleY = animatedScale.value
-                                )
-                                .fillMaxWidth()
-                        )
+                    ) { serie ->
+                        Box(modifier = Modifier) {
+                            ImageFormat(
+                                path = "https://image.tmdb.org/t/p/original${serie.backdropPath}",
+                                isLandscape = isScreenLandscape(),
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .fillMaxWidth()
+                            )
+
+                            Icon(
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .background(
+                                        Color.Black.copy(alpha = 0.7f),
+                                        shape = RoundedCornerShape(100.dp)
+                                    )
+                                    .border(2.dp, Quaternary, RoundedCornerShape(100.dp))
+                                    .align(Alignment.Center)
+                                    .shadow(elevation = 500.dp, spotColor = Color.Black)
+                                    .clickable { onNavigateToSerie(serie) },
+                                imageVector = Icons.Default.PlayArrow,
+                                contentDescription = "Play",
+                                tint = Quaternary,
+                            )
+                        }
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -168,7 +188,7 @@ fun TVShowScreen(
                                 )
                             )
                             Spacer(modifier = Modifier.height(8.dp))
-                            movie.name?.let {
+                            serie.name?.let {
                                 Text(
                                     text = it,
                                     style = AppTypography.headlineMedium.copy(
@@ -179,31 +199,23 @@ fun TVShowScreen(
                         }
                     }
 
-
                 if (!topRatedSeriesInfo.isNullOrEmpty())
                     SerieHorizontalList(
-                        modifier = modifier,
+                        modifier = Modifier,
                         text = "Top Rated Series",
                         series = topRatedSeriesInfo.orEmpty(),
                         onItemClick = onNavigateToSerie,
-                        onViewAllSeries = onViewAllSeries
+                        onViewAllSeries = { onViewAllSeries(it) }
                     )
 
-//                if (!upcomingSeriesInfo.isNullOrEmpty())
-//                    HorizontalList(
-//                        modifier = modifier,
-//                        text = "Upcoming Series",
-//                        items = upcomingSeriesInfo.orEmpty(),
-//                        onItemRender = { serie ->
-//                            AsyncImage(
-//                                model = "https://image.tmdb.org/t/p/w400${serie.posterPath}",
-//                                contentDescription = "Poster",
-//                                modifier = Modifier.fillMaxSize()
-//                            )
-//                        },
-//                        onItemClick = onNavigateToSerie,
-//                        onViewAll = onViewAllSeries
-//                    )
+                if (!upcomingSeriesInfo.isNullOrEmpty())
+                    SerieHorizontalList(
+                        modifier = modifier,
+                        text = "Airing Today",
+                        series = upcomingSeriesInfo.orEmpty(),
+                        onItemClick = onNavigateToSerie,
+                        onViewAllSeries = { onViewAllSeries(it) }
+                    )
             }
         }
     }
