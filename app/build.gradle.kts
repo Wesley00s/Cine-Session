@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.hilt.android)
     kotlin("kapt") version "2.0.20"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.20"
+    id("com.google.gms.google-services")
 }
 
 fun getEnvProperty(key: String): String {
@@ -87,9 +88,16 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx.json)
 
     implementation(libs.dagger.hilt)
+    implementation(libs.play.services.auth)
+    implementation(libs.firebase.auth)
     kapt(libs.dagger.hilt.compiler)
 
     implementation(libs.dotenv.kotlin)
+
+    implementation(libs.firebase.analytics)
+    implementation(platform(libs.firebase.bom))
+
+    implementation(libs.firebase.auth.ktx)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
