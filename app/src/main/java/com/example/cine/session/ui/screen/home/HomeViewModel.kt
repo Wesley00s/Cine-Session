@@ -22,7 +22,7 @@ class HomeViewModel @Inject constructor(
 
     fun onEvent(event: HomeUiEvent) {
         when (event) {
-            is HomeUiEvent.LoadPupularMovieList -> loadPopularMovieList(event.page)
+            is HomeUiEvent.LoadPopularMovieList -> loadPopularMovieList(event.page)
             is HomeUiEvent.LoadTopRatedMovieList -> loadTopRatedMovieList(event.page)
             is HomeUiEvent.LoadFavoritesMovieList -> loadFavoritesMovieList(
                 event.page,
